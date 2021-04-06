@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 11)
 
 include_directories(.)
 
-add_executable(${PROJECT_NAME} main.cpp server/logger/logger.cpp server/logger/logger.h server/logger_test.cpp)
+add_executable(${PROJECT_NAME} server/logger/logger.cpp server/logger/logger.h server/user/user.cpp server/user/user.h server/test.cpp)
