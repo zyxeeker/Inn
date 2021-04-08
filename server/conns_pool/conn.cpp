@@ -54,18 +54,13 @@ namespace conn_pool {
     void conns::conn_listen() {
         epoll_event *events = new epoll_event[m_MAX_EVENTS];
         while (m_listen_status) {
-            int CUR_EVENTS = epoll_wait(m_epoll_fd, events, m_MAX_EVENTS, -1);
+            int CUR_EVENTS_NUMS = epoll_wait(m_epoll_fd, events, m_MAX_EVENTS, -1);
 
-            for (int i = 0; i < CUR_EVENTS; ++i) {
+            for (int i = 0; i < CUR_EVENTS_NUMS; ++i) {
                 // 新连接加入epoll
                 int sock_fd = events[i].data.fd;
                 if (sock_fd == m_listen_fd) {
                     int conn_fd = accept(m_listen_fd, (struct sockaddr *) &m_clientAddr, &m_clientAddrLen);
-
-                    int len = recv(conn_fd, m_BUFF, BUFSIZ, 0);
-                    m_BUFF[len] = '\0';
-                    std::string test_str1 = m_BUFF;
-                    Log::logger(Log::log_level::level::DEBUG, test_str1);
 
                     m_event.data.fd = conn_fd;
                     m_event.events = EPOLLIN | EPOLLET;
@@ -81,12 +76,11 @@ namespace conn_pool {
 
                     m_event.data.fd = sock_fd;
                     m_event.events = EPOLLOUT | EPOLLET;
-//                    epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, m_event.data.fd, &m_event);
+                    epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, m_event.data.fd, &m_event);
                 }
                     // 有数据待发送
                 else if (events[i].events & EPOLLOUT) {
-                    send(sock_fd, "HTTP / 200 OK\r\n", 21, 0);
-//                    close(events[i].data.fd);
+//                    send(sock_fd, "HTTP / 200 OK\r\n", 21, 0);
                     m_event.data.fd = sock_fd;
                     m_event.events = EPOLLIN | EPOLLET;
                     epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, events[i].data.fd, &m_event);

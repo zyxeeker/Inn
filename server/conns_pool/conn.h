@@ -39,7 +39,6 @@ namespace conn_pool {
 
         int m_BUFF_SIZE;
         int m_MAX_EVENTS;
-        int m_CUR_EVENTS;
 
         struct sockaddr_in m_clientAddr;
         struct epoll_event m_event;
