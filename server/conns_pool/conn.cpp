@@ -4,15 +4,30 @@
 
 #include <netinet/in.h>
 #include <cstring>
+#include <unistd.h>
 #include "conn.h"
 
 namespace conn_pool {
+    bool conns::init_epoll() {
+        // epoll 初始化构建
+        m_epoll_fd = epoll_create1(0);
+
+        m_event.events = EPOLLIN | EPOLLET;
+        m_event.data.fd = m_listen_fd;
+
+        // 将事件加入 epoll 事件列表
+        epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, m_listen_fd, &m_event);
+
+        Log::logger(Log::log_level::level::INFO, "epoll init successful");
+
+    }
+
     bool conns::init() {
         struct sockaddr_in addr;
         int on = 1;
-
+        m_BUFF[m_BUFF_SIZE];
         // socket
-        if ((m_socket_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        if ((m_listen_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
             Log::logger(Log::log_level::level::ERROR, "Socket init fail");
 
         // bind
@@ -22,31 +37,59 @@ namespace conn_pool {
 
         //// socket参数
         // 允许端口复用
-        setsockopt(m_socket_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+        setsockopt(m_listen_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
-        if (bind(m_socket_fd, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+        if (bind(m_listen_fd, (struct sockaddr *) &addr, sizeof(addr)) == -1)
             Log::logger(Log::log_level::level::ERROR, "Bind init fail");
 
         // listen
-        if (listen(m_socket_fd, 5) == -1)
+        if (listen(m_listen_fd, 5) == -1)
             Log::logger(Log::log_level::level::ERROR, "Listen init fail");
 
         Log::logger(Log::log_level::level::INFO, "Socket init successful");
+
+        init_epoll();
     }
 
     void conns::conn_listen() {
-        //发送欢迎信息
-        while (true) {
-            int m_conn = accept(m_socket_fd, (struct sockaddr *) &m_clientAddr, &m_clientAddrLen);
-            int len = send(m_conn, "Welcome to my server/n", 21, 0);
-            char buff[1024];
-            /*接收客户端的数据并将其发送给客户端--recv返回接收到的字节数，send返回发送的字节数*/
-            while ((len = recv(m_conn, buff, BUFSIZ, 0)) > 0) {
-                buff[len] = '\0';
-                std::string test_str1 = buff;
-                Log::logger(Log::log_level::level::DEBUG, test_str1);
-                if (send(m_conn, buff, len, 0) < 0) {
-                    Log::logger(Log::log_level::level::ERROR, "Write error!");
+        epoll_event *events = new epoll_event[m_MAX_EVENTS];
+        while (m_listen_status) {
+            int CUR_EVENTS = epoll_wait(m_epoll_fd, events, m_MAX_EVENTS, -1);
+
+            for (int i = 0; i < CUR_EVENTS; ++i) {
+                // 新连接加入epoll
+                int sock_fd = events[i].data.fd;
+                if (sock_fd == m_listen_fd) {
+                    int conn_fd = accept(m_listen_fd, (struct sockaddr *) &m_clientAddr, &m_clientAddrLen);
+
+                    int len = recv(conn_fd, m_BUFF, BUFSIZ, 0);
+                    m_BUFF[len] = '\0';
+                    std::string test_str1 = m_BUFF;
+                    Log::logger(Log::log_level::level::DEBUG, test_str1);
+
+                    m_event.data.fd = conn_fd;
+                    m_event.events = EPOLLIN | EPOLLET;
+
+                    epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, conn_fd, &m_event);
+                }
+                    // 已连接用户
+                else if (events[i].events & EPOLLIN) {
+                    int len = recv(sock_fd, m_BUFF, BUFSIZ, 0);
+                    m_BUFF[len] = '\0';
+                    std::string test_str1 = m_BUFF;
+                    Log::logger(Log::log_level::level::DEBUG, test_str1);
+
+                    m_event.data.fd = sock_fd;
+                    m_event.events = EPOLLOUT | EPOLLET;
+//                    epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, m_event.data.fd, &m_event);
+                }
+                    // 有数据待发送
+                else if (events[i].events & EPOLLOUT) {
+                    send(sock_fd, "HTTP / 200 OK\r\n", 21, 0);
+//                    close(events[i].data.fd);
+                    m_event.data.fd = sock_fd;
+                    m_event.events = EPOLLIN | EPOLLET;
+                    epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, events[i].data.fd, &m_event);
                 }
             }
         }
