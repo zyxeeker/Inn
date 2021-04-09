@@ -22,10 +22,10 @@ namespace SQL {
         bool init();
 
         // 从连接池中返回一个有效链接
-        MYSQL *get_avail_conn();
+        static MYSQL *get_avail_conn();
 
         // 释放已经使用的连接
-        bool release_conn(MYSQL *conn);
+        static bool release_conn(MYSQL *conn);
 
     private:
         // 最大连接数

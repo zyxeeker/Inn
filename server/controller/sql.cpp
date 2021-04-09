@@ -19,6 +19,7 @@ namespace SQL {
         return true;
     }
 
+
     bool conn_pool::init() {
         MYSQL *conn;
         for (int i = 0; i < m_MAX_CONN_NUMBER; ++i) {
