@@ -67,20 +67,22 @@ namespace conn_pool {
 
                     epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, conn_fd, &m_event);
                 }
-                    // 已连接用户
+                    // 已连接用户并读取数据
                 else if (events[i].events & EPOLLIN) {
                     int len = recv(sock_fd, m_BUFF, BUFSIZ, 0);
                     m_BUFF[len] = '\0';
                     std::string test_str1 = m_BUFF;
-                    Log::logger(Log::log_level::level::DEBUG, test_str1);
+                    std::cout << test_str1 << std::endl;
+//                    Log::logger(Log::log_level::level::DEBUG, test_str1);
 
-                    m_event.data.fd = sock_fd;
-                    m_event.events = EPOLLOUT | EPOLLET;
-                    epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, m_event.data.fd, &m_event);
+//                    m_event.data.fd = sock_fd;
+//                    m_event.events = EPOLLOUT | EPOLLET;
+//                    epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, m_event.data.fd, &m_event);
                 }
-                    // 有数据待发送
+//                    // 已连接用户存在有数据待发送
                 else if (events[i].events & EPOLLOUT) {
-//                    send(sock_fd, "HTTP / 200 OK\r\n", 21, 0);
+                    send(sock_fd, "HTTP / 200 OK\r\n", 21, 0);
+//                    close(sock_fd);
                     m_event.data.fd = sock_fd;
                     m_event.events = EPOLLIN | EPOLLET;
                     epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, events[i].data.fd, &m_event);
