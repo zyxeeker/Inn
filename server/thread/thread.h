@@ -8,11 +8,12 @@
 #include <pthread.h>
 #include "locker.h"
 #include <list>
+#include "../controller/sql.h"
 
 template<typename T>
 class thread_pool {
 public:
-    thread_pool(int thread_num, int request_num) : m_THREAD_NUM(thread_num), m_MAX_REQUEST_NUM(request_num) {};
+    thread_pool(int thread_num = 20, int request_num = 20);
 
     bool append_work(T *req);
 
@@ -37,10 +38,14 @@ private:
     // 信号量
     sem m_sem;
     bool m_run_statue{true};
+
 };
 
 template<typename T>
-thread_pool<T>::thread_pool(int thread_num, int request_num) {
+thread_pool<T>::thread_pool(int thread_num, int request_num) : m_THREAD_NUM(thread_num),
+                                                               m_MAX_REQUEST_NUM(request_num) {
+    SQL::conn_pool test("localhost", "root", "123456", 25);
+
     m_threads = new pthread_t[m_THREAD_NUM];
 
     for (int i = 0; i < m_THREAD_NUM; ++i) {
@@ -52,10 +57,6 @@ thread_pool<T>::thread_pool(int thread_num, int request_num) {
     }
 }
 
-template<typename T>
-thread_pool<T>::~thread_pool<T>() {
-    delete[] m_threads;
-}
 
 template<typename T>
 bool thread_pool<T>::append_work(T *req) {
@@ -70,7 +71,7 @@ bool thread_pool<T>::append_work(T *req) {
 }
 
 template<typename T>
-bool thread_pool<T>::worker(void *args) {
+void *thread_pool<T>::worker(void *args) {
     thread_pool *pool = (thread_pool *) args;
     pool->run();
     return pool;
@@ -93,7 +94,9 @@ void thread_pool<T>::run() {
 
         m_locker.unlock();
 
-        req->do_request();
+//        req->do_request();
+
+        req->test(nullptr);
     }
 }
 
