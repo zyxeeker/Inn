@@ -14,12 +14,13 @@
 #include <iostream>
 #include <string>
 #include <sys/epoll.h>
+#include "../thread/thread.h"
+#include "../controller/auth.h"
 
 namespace conn_pool {
     class conns {
     public:
-        conns(int port, int MAX_EVENTS, int BUFF_SIZE) : m_port(port), m_MAX_EVENTS(MAX_EVENTS),
-                                                         m_BUFF_SIZE(BUFF_SIZE) {
+        conns(int port, int MAX_EVENTS, int BUFF_SIZE) : m_port(port), m_MAX_EVENTS(MAX_EVENTS) {
             Log::logger(Log::log_level::level::INFO, "Server is working at " + std::to_string(port));
         }
 
@@ -34,10 +35,6 @@ namespace conn_pool {
         int m_epoll_fd;
         int m_listen_fd;
 
-
-        char *m_BUFF;
-
-        int m_BUFF_SIZE;
         int m_MAX_EVENTS;
 
         struct sockaddr_in m_clientAddr;
@@ -46,6 +43,10 @@ namespace conn_pool {
         socklen_t m_clientAddrLen = sizeof(m_clientAddr);
         // 监听状态
         bool m_listen_status{true};
+
+        auth *m_test_auth;
+        thread_pool<auth> m_login_test_pool;
+
     };
 }
 #endif //INN_CONN_H

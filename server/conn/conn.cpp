@@ -4,7 +4,6 @@
 
 #include <netinet/in.h>
 #include <cstring>
-#include <unistd.h>
 #include "conn.h"
 
 namespace conn_pool {
@@ -25,7 +24,7 @@ namespace conn_pool {
     bool conns::init() {
         struct sockaddr_in addr;
         int on = 1;
-        m_BUFF[m_BUFF_SIZE];
+
         // socket
         if ((m_listen_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
             Log::logger(Log::log_level::level::ERROR, "Socket init fail");
@@ -69,11 +68,14 @@ namespace conn_pool {
                 }
                     // 已连接用户并读取数据
                 else if (events[i].events & EPOLLIN) {
-                    int len = recv(sock_fd, m_BUFF, BUFSIZ, 0);
-                    m_BUFF[len] = '\0';
-                    std::string test_str1 = m_BUFF;
-                    std::cout << test_str1 << std::endl;
-//                    Log::logger(Log::log_level::level::DEBUG, test_str1);
+                    char buff[4096];
+                    int len = recv(sock_fd, buff, BUFSIZ, 0);
+
+                    buff[len] = '\0';
+                    std::string test_str1 = buff;
+
+                    m_login_test_pool.append_work(m_test_auth);
+                    Log::logger(Log::log_level::level::DEBUG, test_str1);
 
 //                    m_event.data.fd = sock_fd;
 //                    m_event.events = EPOLLOUT | EPOLLET;
@@ -90,4 +92,5 @@ namespace conn_pool {
             }
         }
     }
+
 }
