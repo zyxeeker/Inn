@@ -10,10 +10,11 @@
 #include <list>
 #include "../controller/sql.h"
 
+
 template<typename T>
 class thread_pool {
 public:
-    thread_pool(int thread_num = 20, int request_num = 20);
+    thread_pool(SQL::conn_pool *pool, int thread_num = 20, int request_num = 20);
 
     bool append_work(T *req);
 
@@ -37,14 +38,17 @@ private:
     locker m_locker;
     // 信号量
     sem m_sem;
+
     bool m_run_statue{true};
+
+    SQL::conn_pool *m_mysql_pool;
+
 
 };
 
 template<typename T>
-thread_pool<T>::thread_pool(int thread_num, int request_num) : m_THREAD_NUM(thread_num),
-                                                               m_MAX_REQUEST_NUM(request_num) {
-    SQL::conn_pool test("localhost", "root", "123456", 25);
+thread_pool<T>::thread_pool(SQL::conn_pool *pool, int thread_num, int request_num) :
+        m_mysql_pool(pool), m_THREAD_NUM(thread_num), m_MAX_REQUEST_NUM(request_num) {
 
     m_threads = new pthread_t[m_THREAD_NUM];
 
@@ -95,8 +99,9 @@ void thread_pool<T>::run() {
         m_locker.unlock();
 
 //        req->do_request();
-
-        req->test(nullptr);
+        MYSQL *conn = m_mysql_pool->get_avail_conn();
+        req->test(conn);
+        m_mysql_pool->release_conn(conn);
     }
 }
 

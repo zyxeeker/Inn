@@ -20,7 +20,8 @@
 namespace conn_pool {
     class conns {
     public:
-        conns(int port, int MAX_EVENTS, int BUFF_SIZE) : m_port(port), m_MAX_EVENTS(MAX_EVENTS) {
+        conns(thread_pool<auth> *auth_pool, int port, int MAX_EVENTS, int BUFF_SIZE) :
+                m_auth_test_pool(auth_pool), m_port(port), m_MAX_EVENTS(MAX_EVENTS) {
             Log::logger(Log::log_level::level::INFO, "Server is working at " + std::to_string(port));
         }
 
@@ -45,7 +46,7 @@ namespace conn_pool {
         bool m_listen_status{true};
 
         auth *m_test_auth;
-        thread_pool<auth> m_login_test_pool;
+        thread_pool<auth> *m_auth_test_pool;
 
     };
 }
