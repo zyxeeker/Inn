@@ -40,7 +40,7 @@ namespace SQL {
         // 当前连接数
         int m_CUR_CONN_NUMBER;
         // 数据库连接池
-        std::list<MYSQL *> m_SQL_pool{nullptr};
+        std::list<MYSQL *> m_SQL_pool;
 
         // 数据库登陆数据
         const int m_port;

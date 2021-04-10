@@ -26,5 +26,5 @@ void auth::test(MYSQL *conn) {
         std::string temp2(row[1]);
         users[temp1] = temp2;
     }
-    std::cout << users["name"];
+    std::cout << users["name"] << std::endl;
 }
