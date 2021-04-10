@@ -75,6 +75,7 @@ namespace conn_pool {
                     std::string test_str1 = buff;
 
                     m_auth_test_pool->append_work(m_test_auth);
+
                     Log::logger(Log::log_level::level::DEBUG, test_str1);
 
 //                    m_event.data.fd = sock_fd;

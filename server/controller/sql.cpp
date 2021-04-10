@@ -26,11 +26,12 @@ namespace SQL {
     bool conn_pool::init() {
         MYSQL *conn;
         for (int i = 0; i < m_MAX_CONN_NUMBER; ++i) {
-            if (create_conn())
-                Log::logger(Log::log_level::level::INFO, "MYSQL`S CONNECTION CREATED!");
-            else
+            if (!create_conn()) {
                 Log::logger(Log::log_level::level::ERROR, "MYSQL`S CONNECTION CREATED FAIL!");
+                break;
+            }
         }
+        Log::logger(Log::log_level::level::INFO, "MYSQL`S CONNECTION CREATED!");
         return true;
 
     }
@@ -51,6 +52,7 @@ namespace SQL {
     bool conn_pool::release_conn(MYSQL *conn) {
         if (m_CUR_CONN_NUMBER < 0)
             return false;
+        Log::logger(Log::log_level::level::INFO, "RELEASE A CONNECTION!");
 
         mysql_close(conn);
         --m_CUR_CONN_NUMBER;
