@@ -8,7 +8,7 @@
 #include "auth.h"
 
 
-void auth::test(MYSQL *conn) {
+void Auth::test(MYSQL *conn) {
 //    MYSQL_RES *res;
 //    const char *str1 = "select * from user";
 //    mysql_query(conn, str1);

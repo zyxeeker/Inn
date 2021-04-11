@@ -7,7 +7,7 @@
 
 #include <mysql/mysql.h>
 
-class auth {
+class Auth {
 public:
     void test(MYSQL *conn);
 
@@ -15,5 +15,12 @@ private:
     static int m_sockfd;
 };
 
+class Login : private Auth {
+
+};
+
+class Sign : private Auth {
+
+};
 
 #endif //INN_AUTH_H
