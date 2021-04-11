@@ -98,9 +98,8 @@ void thread_pool<T>::run() {
 
         m_locker.unlock();
 
-//        req->do_request();
         MYSQL *conn = m_mysql_pool->get_avail_conn();
-        req->test(conn);
+        req->do_req(conn);
         m_mysql_pool->release_conn(conn);
     }
 }

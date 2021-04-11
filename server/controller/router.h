@@ -11,21 +11,17 @@
 
 class Router {
 public:
-//    Router(SQL::conn_pool *sql_pool) : m_sql_pool(sql_pool) {};
     void init(int epoll_fd, int sock_fd, std::string text);
 
-    void test(MYSQL *conn);
+    void do_req(MYSQL *conn);
 
-    static std::string m_message;
+    std::string m_message;
 private:
     std::string m_text;
-    Auth m_auth;
 
     int m_epoll_fd;
     int m_sock_fd;
 
 };
-
-
 
 #endif //INN_ROUTER_H

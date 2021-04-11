@@ -10,18 +10,24 @@
 
 class Auth {
 public:
-    int test(MYSQL *conn, std::string user, std::string pwd);
+    Auth(MYSQL *conn) : m_mysql_conn(conn) {};
+
+    MYSQL *get_conn() { return m_mysql_conn; }
 
 private:
-    static int m_sockfd;
+    MYSQL *m_mysql_conn;
 };
 
-class Login : private Auth {
+class Login : public Auth {
+public:
+    Login(MYSQL *conn) : Auth(conn) {};
 
+    int login_confirm(std::string user, std::string pwd);
 };
 
-class Sign : private Auth {
-
+class Reg : private Auth {
+public:
+//    int reg_confirm(std::string user, std::string pwd);
 };
 
 #endif //INN_AUTH_H

@@ -7,7 +7,7 @@
 #include "auth.h"
 #include "../conn/conn.h"
 
-enum AUTH_STATUE {
+enum LOGIN_STATUE {
     CORRECT,
 #define CORRECT CORRECT
     UP_ERROR,
@@ -17,8 +17,10 @@ enum AUTH_STATUE {
 };
 
 
-int Auth::test(MYSQL *conn, std::string user, std::string pwd) {
+int Login::login_confirm(std::string user, std::string pwd) {
     std::map<std::string, std::string> users;
+    MYSQL *conn = get_conn();
+
     mysql_query(conn, "SELECT username,passwd FROM user");
     //从表中检索完整的结果集
     MYSQL_RES *result = mysql_store_result(conn);
@@ -38,5 +40,4 @@ int Auth::test(MYSQL *conn, std::string user, std::string pwd) {
         return P_ERROR;
 
     return CORRECT;
-
 }

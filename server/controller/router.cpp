@@ -4,15 +4,14 @@
 
 #include "router.h"
 
-std::string Router::m_message;
-
 void Router::init(int epoll_fd, int sock_fd, std::string text) {
     m_epoll_fd = epoll_fd;
     m_sock_fd = sock_fd;
     m_text = text;
 }
 
-void Router::test(MYSQL *conn) {
+void Router::do_req(MYSQL *conn) {
+    Login login(conn);
     if (!m_text.find("LOGIN", 0)) {
         m_text = m_text.substr(6);
         std::string user;
@@ -24,7 +23,8 @@ void Router::test(MYSQL *conn) {
                 break;
             }
         }
-        if (m_auth.test(conn, user, pwd) != 0) {
+
+        if (login.login_confirm(user, pwd) != 0) {
             conn_pool::conns::epoll_mod(m_epoll_fd, m_sock_fd, EPOLLOUT | EPOLLET);
             m_message = "用户名/密码错误";
             return;
