@@ -4,6 +4,7 @@
 
 #include <netinet/in.h>
 #include <cstring>
+#include <unistd.h>
 #include "conn.h"
 
 namespace conn_pool {
@@ -21,9 +22,23 @@ namespace conn_pool {
 
     }
 
+    void conns::epoll_mod(int epoll_fd, int sock_fd, int statue, int way) {
+        struct epoll_event event;
+        event.data.fd = sock_fd;
+        event.events = statue;
+        epoll_ctl(epoll_fd, way, sock_fd, &event);
+    }
+
+    void conns::sock_send(std::string message, int sock_fd) {
+        send(sock_fd, message.c_str(), message.size(), 0);
+        close(sock_fd);
+    }
+
     bool conns::init() {
         struct sockaddr_in addr;
         int on = 1;
+
+        m_router = new Router[m_MAX_EVENTS];
 
         // socket
         if ((m_listen_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
@@ -60,35 +75,27 @@ namespace conn_pool {
                 int sock_fd = events[i].data.fd;
                 if (sock_fd == m_listen_fd) {
                     int conn_fd = accept(m_listen_fd, (struct sockaddr *) &m_clientAddr, &m_clientAddrLen);
-
-                    m_event.data.fd = conn_fd;
-                    m_event.events = EPOLLIN | EPOLLET;
-
-                    epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, conn_fd, &m_event);
+                    epoll_mod(m_epoll_fd, conn_fd, EPOLLIN | EPOLLET, EPOLL_CTL_ADD);
                 }
                     // 已连接用户并读取数据
                 else if (events[i].events & EPOLLIN) {
                     char buff[4096];
                     int len = recv(sock_fd, buff, BUFSIZ, 0);
-
+                    if (len <= 0)
+                        close(sock_fd);
                     buff[len] = '\0';
                     std::string test_str1 = buff;
 
-                    m_auth_test_pool->append_work(m_test_auth);
+                    m_router[i].init(m_epoll_fd, sock_fd, test_str1);
+                    m_router_pool->append_work(m_router + i);
 
                     Log::logger(Log::log_level::level::DEBUG, test_str1);
-
-//                    m_event.data.fd = sock_fd;
-//                    m_event.events = EPOLLOUT | EPOLLET;
-//                    epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, m_event.data.fd, &m_event);
                 }
-//                    // 已连接用户存在有数据待发送
+                    // 已连接用户存在有数据待发送
                 else if (events[i].events & EPOLLOUT) {
-                    send(sock_fd, "HTTP / 200 OK\r\n", 21, 0);
-//                    close(sock_fd);
-                    m_event.data.fd = sock_fd;
-                    m_event.events = EPOLLIN | EPOLLET;
-                    epoll_ctl(m_epoll_fd, EPOLL_CTL_MOD, events[i].data.fd, &m_event);
+                    std::string message = m_router->m_message;
+                    send(sock_fd, message.c_str(), message.size(), 0);
+                    close(sock_fd);
                 }
             }
         }

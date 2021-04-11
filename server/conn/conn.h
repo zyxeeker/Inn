@@ -16,12 +16,15 @@
 #include <sys/epoll.h>
 #include "../thread/thread.h"
 #include "../controller/auth.h"
+#include "../controller/router.h"
+
+class Router;
 
 namespace conn_pool {
     class conns {
     public:
-        conns(thread_pool<Auth> *auth_pool, int port, int MAX_EVENTS, int BUFF_SIZE) :
-                m_auth_test_pool(auth_pool), m_port(port), m_MAX_EVENTS(MAX_EVENTS) {
+        conns(thread_pool<Router> *router_pool, int port, int MAX_EVENTS, int BUFF_SIZE) :
+                m_router_pool(router_pool), m_port(port), m_MAX_EVENTS(MAX_EVENTS) {
             Log::logger(Log::log_level::level::INFO, "Server is working at " + std::to_string(port));
         }
 
@@ -30,6 +33,10 @@ namespace conn_pool {
         bool init_epoll();
 
         void conn_listen();
+
+        static void epoll_mod(int epoll_fd, int sock_fd, int statue, int way = EPOLL_CTL_MOD);
+
+        static void sock_send(std::string message, int sock_fd);
 
     private:
         int m_port;
@@ -45,8 +52,9 @@ namespace conn_pool {
         // 监听状态
         bool m_listen_status{true};
 
-        Auth *m_test_auth;
-        thread_pool<Auth> *m_auth_test_pool;
+        Router *m_router;
+
+        thread_pool<Router> *m_router_pool;
 
     };
 }

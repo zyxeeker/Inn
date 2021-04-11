@@ -6,10 +6,11 @@
 #define INN_AUTH_H
 
 #include <mysql/mysql.h>
+#include <iostream>
 
 class Auth {
 public:
-    void test(MYSQL *conn);
+    int test(MYSQL *conn, std::string user, std::string pwd);
 
 private:
     static int m_sockfd;

@@ -4,14 +4,20 @@
 
 #include <string>
 #include <map>
-#include <iostream>
 #include "auth.h"
+#include "../conn/conn.h"
+
+enum AUTH_STATUE {
+    CORRECT,
+#define CORRECT CORRECT
+    UP_ERROR,
+#define UP_ERROR UP_ERROR
+    P_ERROR,
+#define P_ERROR P_ERROR
+};
 
 
-void Auth::test(MYSQL *conn) {
-//    MYSQL_RES *res;
-//    const char *str1 = "select * from user";
-//    mysql_query(conn, str1);
+int Auth::test(MYSQL *conn, std::string user, std::string pwd) {
     std::map<std::string, std::string> users;
     mysql_query(conn, "SELECT username,passwd FROM user");
     //从表中检索完整的结果集
@@ -26,5 +32,11 @@ void Auth::test(MYSQL *conn) {
         std::string temp2(row[1]);
         users[temp1] = temp2;
     }
-    std::cout << users["name"] << std::endl;
+    if (users.find(user) == users.end())
+        return UP_ERROR;
+    else if (users[user] != pwd)
+        return P_ERROR;
+
+    return CORRECT;
+
 }

@@ -7,37 +7,25 @@
 
 #include "sql.h"
 #include "auth.h"
+#include "../conn/conn.h"
 
 class Router {
 public:
-    Router(SQL::conn_pool *sql_pool) : m_sql_pool(sql_pool) {};
+//    Router(SQL::conn_pool *sql_pool) : m_sql_pool(sql_pool) {};
+    void init(int epoll_fd, int sock_fd, std::string text);
 
-    virtual void parse_operations() = 0;
+    void test(MYSQL *conn);
 
-    virtual void sql_operations() = 0;
-
+    static std::string m_message;
 private:
-    SQL::conn_pool *m_sql_pool;
+    std::string m_text;
+    Auth m_auth;
+
+    int m_epoll_fd;
+    int m_sock_fd;
 
 };
 
-class Auth : private Router {
-public:
-    void parse_operations() override;
 
-    void sql_operations() override;
-
-private:
-    auth m_auth;
-};
-
-class Chat : private Router {
-public:
-    void parse_operations() override;
-
-    void sql_operations() override;
-
-private:
-};
 
 #endif //INN_ROUTER_H
