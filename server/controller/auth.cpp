@@ -37,7 +37,7 @@ void Auth::init() {
     }
 }
 
-bool Auth::insert_user(std::string user, std::string pwd) {
+bool Auth::insert_user(const std::string &user, const std::string &pwd) {
     std::string query_tmp = "INSERT INTO user (username, passwd) VALUES (\"" + user + "\", \"" + pwd + "\");";
 
     mysql_query(m_mysql_conn, query_tmp.c_str());
@@ -50,7 +50,6 @@ int Login::confirm(std::string user, std::string pwd) {
         return UP_ERROR;
     else if (users[user] != pwd)
         return P_ERROR;
-
     return CORRECT;
 }
 

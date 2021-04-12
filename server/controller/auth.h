@@ -17,7 +17,7 @@ public:
 
     virtual int confirm(std::string user, std::string pwd) = 0;
 
-    bool insert_user(std::string user, std::string pwd);
+    bool insert_user(const std::string &user, const std::string &pwd);
 
     std::unordered_map<std::string, std::string> get_result() { return m_users; }
 
@@ -32,9 +32,6 @@ public:
     Login(MYSQL *conn) : Auth(conn) {};
 
     int confirm(std::string user, std::string pwd) override;
-
-private:
-    std::unordered_map<std::string, std::string> m_users;
 
 };
 

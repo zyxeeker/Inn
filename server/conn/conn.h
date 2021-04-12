@@ -34,13 +34,15 @@ namespace conn_pool {
 
         void conn_listen();
 
-        static void epoll_mod(int epoll_fd, int sock_fd, int statue, int way = EPOLL_CTL_MOD);
+        static void epoll_mod(int sock_fd, int statue, int way = EPOLL_CTL_MOD);
 
         static void sock_send(std::string message, int sock_fd);
 
+    public:
+        static int m_epoll_fd;
+
     private:
         int m_port;
-        int m_epoll_fd;
         int m_listen_fd;
 
         int m_MAX_EVENTS;
