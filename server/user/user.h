@@ -9,7 +9,9 @@ public:
     user();
     void SetBaseInformation();
     void SetAccountInfo();
-    void PrintInfo();
+    void PrintInfo(); //打印用户信息
+    void RequestConnect();
+    void ExitLog();
     int LogIn();
     int SendMessage();
     int Exit();
