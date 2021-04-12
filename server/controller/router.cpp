@@ -25,7 +25,7 @@ void Router::do_req(MYSQL *conn) {
             }
         }
 
-        if (login.login_confirm(user, pwd) != 0) {
+        if (login.confirm(user, pwd) != 0) {
             conn_pool::conns::epoll_mod(m_epoll_fd, m_sock_fd, EPOLLOUT | EPOLLET);
             m_message = "用户名/密码错误";
             return;
@@ -46,7 +46,7 @@ void Router::do_req(MYSQL *conn) {
             }
         }
 
-        if (reg.reg_confirm(user, pwd) != 0) {
+        if (reg.confirm(user, pwd) != 0) {
             conn_pool::conns::epoll_mod(m_epoll_fd, m_sock_fd, EPOLLOUT | EPOLLET);
             m_message = "用户名已存在！";
             return;
