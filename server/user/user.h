@@ -3,18 +3,28 @@
 //
 #ifndef INN_USER_H
 #define INN_USER_H
-namespace user_s {
-class user{
+
+#include <unordered_map>
+
+class user {
 public:
     user();
+
     void SetBaseInformation();
+
     void SetAccountInfo();
-    void PrintInfo(); //打印用户信息
-    void RequestConnect();
-    void ExitLog();
+
+    void PrintInfo();
+
     int LogIn();
+
     int SendMessage();
+
     int Exit();
+
+public:
+    // 用户总列表
+    static std::unordered_map<std::string, int> user_socket;
 
 private:
     char m_u_id[20];
@@ -24,6 +34,5 @@ private:
 
 };
 
-}
 #endif //INN_USER_H
 
