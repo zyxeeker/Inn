@@ -26,13 +26,13 @@ int user_s::user::SendMessage(){
 }
 void user_s::user::SetBaseInformation() {
     std::cout<<"请输入ID:";
-    std::cin>>this->u_id;
+    std::cin>>u_id;
     std::cout<<"请设置您的密码:";
-    std::cin>> this->u_password;
+    std::cin>> u_password;
     std::cout<<"请输入您的名字:";
-    std::cin>> this->u_name;
+    std::cin>> u_name;
     std::cout<<"请输入您的个人简介:";
-    std::cin>>this->Intro;
+    std::cin>>Intro;
 
 }
 void user_s::user::PrintInfo() {

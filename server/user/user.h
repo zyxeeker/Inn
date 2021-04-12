@@ -17,10 +17,10 @@ public:
     int Exit();
 
 private:
-    char u_id[20];
-    char u_name[10];
-    char u_password[20];
-    char Intro[200];
+    char m_u_id[20];
+    char m_u_name[10];
+    char m_u_password[20];
+    char m_Intro[200];
 
 };
 

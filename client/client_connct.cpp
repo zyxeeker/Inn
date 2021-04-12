@@ -21,7 +21,7 @@ void sys_err(const char *str){
 
 
 
-void ClintConnect(){
+int main (int argc,int *arcv[]){
 
     char buf[9999];
     int cfd;
