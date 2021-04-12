@@ -9,6 +9,7 @@
 #include "auth.h"
 #include "../conn/conn.h"
 #include "../user/user.h"
+#include "chatting_room.h"
 
 class Router {
 public:

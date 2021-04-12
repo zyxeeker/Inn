@@ -54,4 +54,21 @@ void Router::do_req(MYSQL *conn) {
             conn_pool::conns::epoll_mod(m_sock_fd, EPOLLOUT | EPOLLET);
         m_message = "注册成功！";
     }
+
+    if (!m_text.find("CHAT", 0)) {
+        m_text = m_text.substr(5);
+        std::string user_tmp;
+        std::string text;
+        for (int i = 0; i != m_text.size(); ++i) {
+            if (m_text[i] == ' ') {
+                user_tmp = m_text.substr(0, i);
+                text = m_text.substr(i + 1);
+                break;
+            }
+        }
+
+        u2u::send(user_tmp);
+        m_message = text;
+        return;
+    }
 }

@@ -83,8 +83,9 @@ namespace conn_pool {
                 else if (events[i].events & EPOLLIN) {
                     char buff[4096];
                     int len = recv(sock_fd, buff, BUFSIZ, 0);
+                    std::cout << "121212" << std::endl;
                     if (len <= 0)
-                        close(sock_fd);
+                        continue;
                     buff[len] = '\0';
 
                     std::string test_str1 = buff;
@@ -97,8 +98,10 @@ namespace conn_pool {
                     // 已连接用户存在有数据待发送
                 else if (events[i].events & EPOLLOUT) {
                     std::string message = m_router->m_message;
+                    std::cout << message << std::endl;
                     send(sock_fd, message.c_str(), message.size(), 0);
-                    close(sock_fd);
+                    epoll_mod(sock_fd, EPOLLIN | EPOLLET);
+//                    close(sock_fd);
                 }
             }
         }

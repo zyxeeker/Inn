@@ -5,12 +5,16 @@
 #ifndef INN_CHATTING_ROOM_H
 #define INN_CHATTING_ROOM_H
 
+#include "../user/user.h"
+#include "../conn/conn.h"
+
 class Chat {
 
 };
 
 class u2u : private Chat {
-
+public:
+    static int send(const std::string &receiver);
 };
 
 class u2a : private Chat {
