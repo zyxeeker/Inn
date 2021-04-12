@@ -8,6 +8,8 @@
 #include "conn.h"
 
 namespace conn_pool {
+    int conns::m_epoll_fd;
+
     bool conns::init_epoll() {
         // epoll 初始化构建
         m_epoll_fd = epoll_create1(0);
@@ -22,11 +24,11 @@ namespace conn_pool {
 
     }
 
-    void conns::epoll_mod(int epoll_fd, int sock_fd, int statue, int way) {
+    void conns::epoll_mod(int sock_fd, int statue, int way) {
         struct epoll_event event;
         event.data.fd = sock_fd;
         event.events = statue;
-        epoll_ctl(epoll_fd, way, sock_fd, &event);
+        epoll_ctl(m_epoll_fd, way, sock_fd, &event);
     }
 
     void conns::sock_send(std::string message, int sock_fd) {
@@ -75,18 +77,20 @@ namespace conn_pool {
                 int sock_fd = events[i].data.fd;
                 if (sock_fd == m_listen_fd) {
                     int conn_fd = accept(m_listen_fd, (struct sockaddr *) &m_clientAddr, &m_clientAddrLen);
-                    epoll_mod(m_epoll_fd, conn_fd, EPOLLIN | EPOLLET, EPOLL_CTL_ADD);
+                    epoll_mod(conn_fd, EPOLLIN | EPOLLET, EPOLL_CTL_ADD);
                 }
                     // 已连接用户并读取数据
                 else if (events[i].events & EPOLLIN) {
                     char buff[4096];
                     int len = recv(sock_fd, buff, BUFSIZ, 0);
+                    std::cout << "121212" << std::endl;
                     if (len <= 0)
-                        close(sock_fd);
+                        continue;
                     buff[len] = '\0';
+
                     std::string test_str1 = buff;
 
-                    m_router[i].init(m_epoll_fd, sock_fd, test_str1);
+                    m_router[i].init(sock_fd, test_str1);
                     m_router_pool->append_work(m_router + i);
 
                     Log::logger(Log::log_level::level::DEBUG, test_str1);
@@ -94,8 +98,10 @@ namespace conn_pool {
                     // 已连接用户存在有数据待发送
                 else if (events[i].events & EPOLLOUT) {
                     std::string message = m_router->m_message;
+                    std::cout << message << std::endl;
                     send(sock_fd, message.c_str(), message.size(), 0);
-                    close(sock_fd);
+                    epoll_mod(sock_fd, EPOLLIN | EPOLLET);
+//                    close(sock_fd);
                 }
             }
         }
