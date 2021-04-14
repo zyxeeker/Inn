@@ -9,7 +9,7 @@
 #include<ctype.h>
 #include<sys/socket.h>
 #include<arpa/inet.h>
-#include <client/client_connct.h>
+//#include <client/client_connct.h>
 
 #define MAX_USER_NUMBER 1000
 

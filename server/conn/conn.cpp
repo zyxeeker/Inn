@@ -83,7 +83,6 @@ namespace conn_pool {
                 else if (events[i].events & EPOLLIN) {
                     char buff[4096];
                     int len = recv(sock_fd, buff, BUFSIZ, 0);
-                    std::cout << "121212" << std::endl;
                     if (len <= 0)
                         continue;
                     buff[len] = '\0';
