@@ -7,29 +7,17 @@
 
 #include <string>
 #include <ctime>
+#include "server/constant/log_define.h"
 
-namespace Log{
-    // 日志等级
-    struct log_level {
-        enum level{
-            UNKNOWN,
-            DEBUG,
-            INFO,
-            WARN,
-            ERROR,
-            FATAL
-        };
-        std::string toString(log_level::level);
-    };
+class Logger {
+public:
+    std::string toString(LogLevel level);
 
-    // 日志生成器
-    class logger {
-    public:
-        logger(log_level::level, std::string content);
+    Logger(LogLevel level, std::string content);
 
-    private:
-        log_level log_level_trans;
-        std::string m_content;
-    };
-}
+public:
+    static void Out(LogLevel level, std::string content);
+
+};
+
 #endif //INN_LOGGER_H
