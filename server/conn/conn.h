@@ -10,13 +10,13 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "../logger/logger.h"
+#include "server/logger/logger.h"
 #include <iostream>
 #include <string>
 #include <sys/epoll.h>
-#include "../thread/thread.h"
-#include "../controller/auth.h"
-#include "../controller/router.h"
+#include "server/thread/thread.h"
+#include "server/model/auth/auth.h"
+#include "server/controller/router.h"
 
 class Router;
 

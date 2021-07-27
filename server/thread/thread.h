@@ -8,7 +8,7 @@
 #include <pthread.h>
 #include "locker.h"
 #include <list>
-#include "../controller/sql.h"
+#include "server/controller/sql.h"
 
 
 template<typename T>

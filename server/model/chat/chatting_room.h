@@ -5,8 +5,8 @@
 #ifndef INN_CHATTING_ROOM_H
 #define INN_CHATTING_ROOM_H
 
-#include "../user/user.h"
-#include "../conn/conn.h"
+#include "server/model/user/user.h"
+#include "server/conn/conn.h"
 
 class Chat {
 
