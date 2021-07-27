@@ -20,7 +20,7 @@ namespace conn_pool {
         // 将事件加入 epoll 事件列表
         epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, m_listen_fd, &m_event);
 
-        Log::logger(Log::log_level::level::INFO, "epoll init successful");
+        Logger::Out(INFO, "epoll init successful");
 
     }
 
@@ -44,7 +44,7 @@ namespace conn_pool {
 
         // socket
         if ((m_listen_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-            Log::logger(Log::log_level::level::ERROR, "Socket init fail");
+            Logger::Out(ERROR, "Socket init fail");
 
         // bind
         addr.sin_family = AF_INET;
@@ -56,13 +56,13 @@ namespace conn_pool {
         setsockopt(m_listen_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
         if (bind(m_listen_fd, (struct sockaddr *) &addr, sizeof(addr)) == -1)
-            Log::logger(Log::log_level::level::ERROR, "Bind init fail");
+            Logger::Out(ERROR, "Bind init fail");
 
         // listen
         if (listen(m_listen_fd, 5) == -1)
-            Log::logger(Log::log_level::level::ERROR, "Listen init fail");
+            Logger::Out(ERROR, "Listen init fail");
 
-        Log::logger(Log::log_level::level::INFO, "Socket init successful");
+        Logger::Out(INFO, "Socket init successful");
 
         init_epoll();
     }
@@ -92,7 +92,7 @@ namespace conn_pool {
                     m_router[i].init(sock_fd, test_str1);
                     m_router_pool->append_work(m_router + i);
 
-                    Log::logger(Log::log_level::level::DEBUG, test_str1);
+                    Logger::Out(DEBUG, test_str1);
                 }
                     // 已连接用户存在有数据待发送
                 else if (events[i].events & EPOLLOUT) {

@@ -27,11 +27,11 @@ namespace SQL {
         MYSQL *conn;
         for (int i = 0; i < m_MAX_CONN_NUMBER; ++i) {
             if (!create_conn()) {
-                Log::logger(Log::log_level::level::ERROR, "MYSQL`S CONNECTION CREATED FAIL!");
+                Logger::Out(ERROR, "MYSQL`S CONNECTION CREATED FAIL!");
                 break;
             }
         }
-        Log::logger(Log::log_level::level::INFO, "MYSQL`S CONNECTION CREATED!");
+        Logger::Out(INFO, "MYSQL`S CONNECTION CREATED!");
         return true;
 
     }
@@ -45,24 +45,24 @@ namespace SQL {
             ++m_CUR_CONN_NUMBER;
             return conn;
         }
-        Log::logger(Log::log_level::level::FATAL, "MYSQL`S CONNECTION NUMBER ALREADY TO MAX!");
+        Logger::Out(FATAL, "MYSQL`S CONNECTION NUMBER ALREADY TO MAX!");
         return nullptr;
     }
 
     bool conn_pool::release_conn(MYSQL *conn) {
         if (m_CUR_CONN_NUMBER < 0)
             return false;
-        Log::logger(Log::log_level::level::INFO, "RELEASE A CONNECTION!");
+        Logger::Out(INFO, "RELEASE A CONNECTION!");
 
         mysql_close(conn);
         --m_CUR_CONN_NUMBER;
 
         // 释放后添加新的连接
         if (create_conn()) {
-            Log::logger(Log::log_level::level::INFO, "ADD A NEW CONNECTION!");
+            Logger::Out(INFO, "ADD A NEW CONNECTION!");
             return true;
         } else {
-            Log::logger(Log::log_level::level::ERROR, "A NEW CONNECTION FAILED TO ADD!");
+            Logger::Out(ERROR, "A NEW CONNECTION FAILED TO ADD!");
             return false;
         }
     }

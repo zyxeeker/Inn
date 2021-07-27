@@ -25,7 +25,7 @@ namespace conn_pool {
     public:
         conns(thread_pool<Router> *router_pool, int port, int MAX_EVENTS, int BUFF_SIZE) :
                 m_router_pool(router_pool), m_port(port), m_MAX_EVENTS(MAX_EVENTS) {
-            Log::logger(Log::log_level::level::INFO, "Server is working at " + std::to_string(port));
+            Logger::Out(INFO, "Server is working at " + std::to_string(port));
         }
 
         bool init();
