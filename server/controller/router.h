@@ -6,10 +6,10 @@
 #define INN_ROUTER_H
 
 #include "sql.h"
-#include "server/model/auth/auth.h"
+#include "server/service/auth/auth.h"
 #include "server/conn/conn.h"
-#include "server/model/user/user.h"
-#include "server/model/chat/chatting_room.h"
+#include "server/service/user/user.h"
+#include "server/service/chat/chatting_room.h"
 
 class Router {
 public:

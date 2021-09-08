@@ -21,7 +21,7 @@ enum REG_STATUE {
 #define U_ERROR U_ERROR
 };
 
-void Auth::init() {
+void Auth::Init() {
     mysql_query(m_mysql_conn, "SELECT username,passwd FROM user");
     //从表中检索完整的结果集
     MYSQL_RES *result = mysql_store_result(m_mysql_conn);
@@ -37,29 +37,29 @@ void Auth::init() {
     }
 }
 
-bool Auth::insert_user(const std::string &user, const std::string &pwd) {
+bool Auth::InsertUser(const std::string &user, const std::string &pwd) {
     std::string query_tmp = "INSERT INTO user (username, passwd) VALUES (\"" + user + "\", \"" + pwd + "\");";
 
     mysql_query(m_mysql_conn, query_tmp.c_str());
 }
 
-int Login::confirm(std::string user, std::string pwd) {
+int Login::Confirm(std::string user, std::string pwd) {
     std::unordered_map<std::string, std::string> users;
-    users = get_result();
+    users = GetResult();
     if (users.find(user) == users.end())
-        return UP_ERROR;
+        return LOGIN_NOT_EXISTED;
     else if (users[user] != pwd)
-        return P_ERROR;
-    return CORRECT;
+        return LOGIN_FAIL;
+    return LOGIN_SUC;
 }
 
 
-int Reg::confirm(std::string user, std::string pwd) {
+int Reg::Confirm(std::string user, std::string pwd) {
     std::unordered_map<std::string, std::string> users;
-    users = get_result();
+    users = GetResult();
     if (users.find(user) == users.end()) {
-        insert_user(user, pwd);
-        return CORRECT;
+        InsertUser(user, pwd);
+        return REG_SUC;
     } else
-        return U_ERROR;
+        return REG_FAIL;
 }

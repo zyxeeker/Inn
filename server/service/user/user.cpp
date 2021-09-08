@@ -1,15 +1,5 @@
 #include"user.h"
 #include<iostream>
-#include<stdlib.h>
-#include<unistd.h>
-#include<fcntl.h>
-#include<string.h>
-#include<pthread.h>
-#include<sys/epoll.h>
-#include<ctype.h>
-#include<sys/socket.h>
-#include<arpa/inet.h>
-//#include <client/client_connct.h>
 
 #define MAX_USER_NUMBER 1000
 

@@ -15,7 +15,7 @@
 #include <string>
 #include <sys/epoll.h>
 #include "server/thread/thread.h"
-#include "server/model/auth/auth.h"
+#include "server/service/auth/auth.h"
 #include "server/controller/router.h"
 
 class Router;

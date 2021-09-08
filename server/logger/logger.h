@@ -7,16 +7,16 @@
 
 #include <string>
 #include <ctime>
-#include "server/constant/log_define.h"
+#include "server/model/define.h"
 
 class Logger {
 public:
-    std::string toString(LogLevel level);
+    std::string toString(LOG_LEVEL level);
 
-    Logger(LogLevel level, std::string content);
+    Logger(LOG_LEVEL level, std::string content);
 
 public:
-    static void Out(LogLevel level, std::string content);
+    static void Out(LOG_LEVEL level, std::string content);
 
 };
 

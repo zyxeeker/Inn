@@ -5,10 +5,10 @@
 #include "logger.h"
 #include <iostream>
 
-std::string Logger::toString(LogLevel level) {
+std::string Logger::toString(LOG_LEVEL level) {
     switch (level) {
 #define TRANS(level) \
-    case LogLevel::level: \
+    case LOG_LEVEL::level: \
         return #level; \
         break;
 
@@ -25,7 +25,7 @@ std::string Logger::toString(LogLevel level) {
     return "UNKNOWN";
 }
 
-Logger::Logger(LogLevel level, std::string content) {
+Logger::Logger(LOG_LEVEL level, std::string content) {
     char date_t[50];
 
     time_t now = time(nullptr);
@@ -34,6 +34,6 @@ Logger::Logger(LogLevel level, std::string content) {
     std::cout << date_t << " [" << toString(level) << "]" << ":" << content << std::endl;
 }
 
-void Logger::Out(LogLevel level, std::string content) {
+void Logger::Out(LOG_LEVEL level, std::string content) {
     auto *log = new Logger(level, content);
 }
