@@ -10,24 +10,24 @@
 #include <list>
 #include <iostream>
 
-namespace SQL {
-    class conn_pool {
+namespace Inn {
+    class SQLConnPool {
     public:
-        conn_pool(std::string host, std::string user, std::string pwd, int max_conn_number, int port = 3306) :
+        SQLConnPool(std::string host, std::string user, std::string pwd, int max_conn_number, int port = 3306) :
                 m_MAX_CONN_NUMBER(max_conn_number), m_CUR_CONN_NUMBER(0), m_host(host), m_user(user), m_pwd(pwd),
                 m_port(port) {};
 
         // 创建连接
-        bool create_conn();
+        bool CreateConn();
 
         // 连接池初始化
-        bool init();
+        bool Init();
 
         // 从连接池中返回一个有效链接
-        MYSQL *get_avail_conn();
+        MYSQL *GetAvailConn();
 
         // 释放已经使用的连接
-        bool release_conn(MYSQL *conn);
+        bool ReleaseConn(MYSQL *conn);
 
 //        // 最大连接数
 //        static int m_MAX_CONN_NUMBER;

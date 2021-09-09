@@ -7,44 +7,44 @@
 #include <unistd.h>
 #include "conn.h"
 
-namespace conn_pool {
-    int conns::m_epoll_fd;
+namespace Inn {
+    int ConnPool::m_epollFd;
 
-    bool conns::init_epoll() {
+    bool ConnPool::InitEpoll() {
         // epoll 初始化构建
-        m_epoll_fd = epoll_create1(0);
+        m_epollFd = epoll_create1(0);
 
         m_event.events = EPOLLIN | EPOLLET;
-        m_event.data.fd = m_listen_fd;
+        m_event.data.fd = m_listenFd;
 
         // 将事件加入 epoll 事件列表
-        epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, m_listen_fd, &m_event);
+        epoll_ctl(m_epollFd, EPOLL_CTL_ADD, m_listenFd, &m_event);
 
-        Logger::Out(INFO, "epoll init successful");
+        LOG("epoll init successful");
 
     }
 
-    void conns::epoll_mod(int sock_fd, int statue, int way) {
+    void ConnPool::EpollMod(int sock_fd, int statue, int way) {
         struct epoll_event event;
         event.data.fd = sock_fd;
         event.events = statue;
-        epoll_ctl(m_epoll_fd, way, sock_fd, &event);
+        epoll_ctl(m_epollFd, way, sock_fd, &event);
     }
 
-    void conns::sock_send(std::string message, int sock_fd) {
-        send(sock_fd, message.c_str(), message.size(), 0);
-        close(sock_fd);
+    void ConnPool::SocketSend(std::string message, int socket_fd) {
+        send(socket_fd, message.c_str(), message.size(), 0);
+        close(socket_fd);
     }
 
-    bool conns::init() {
+    bool ConnPool::Init() {
         struct sockaddr_in addr;
         int on = 1;
 
         m_router = new Router[m_MAX_EVENTS];
 
         // socket
-        if ((m_listen_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-            Logger::Out(ERROR, "Socket init fail");
+        if ((m_listenFd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+            LOGE("Socket init fail");
 
         // bind
         addr.sin_family = AF_INET;
@@ -53,31 +53,31 @@ namespace conn_pool {
 
         //// socket参数
         // 允许端口复用
-        setsockopt(m_listen_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+        setsockopt(m_listenFd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
 
-        if (bind(m_listen_fd, (struct sockaddr *) &addr, sizeof(addr)) == -1)
-            Logger::Out(ERROR, "Bind init fail");
+        if (bind(m_listenFd, (struct sockaddr *) &addr, sizeof(addr)) == -1)
+            LOGE("Bind init fail");
 
         // listen
-        if (listen(m_listen_fd, 5) == -1)
-            Logger::Out(ERROR, "Listen init fail");
+        if (listen(m_listenFd, 5) == -1)
+            LOGE("Listen init fail");
 
-        Logger::Out(INFO, "Socket init successful");
+        LOG("Socket init successful");
 
-        init_epoll();
+        InitEpoll();
     }
 
-    void conns::conn_listen() {
+    void ConnPool::StartListen() {
         epoll_event *events = new epoll_event[m_MAX_EVENTS];
-        while (m_listen_status) {
-            int CUR_EVENTS_NUMS = epoll_wait(m_epoll_fd, events, m_MAX_EVENTS, -1);
+        while (m_listenSt) {
+            int CUR_EVENTS_NUMS = epoll_wait(m_epollFd, events, m_MAX_EVENTS, -1);
 
             for (int i = 0; i < CUR_EVENTS_NUMS; ++i) {
                 // 新连接加入epoll
                 int sock_fd = events[i].data.fd;
-                if (sock_fd == m_listen_fd) {
-                    int conn_fd = accept(m_listen_fd, (struct sockaddr *) &m_clientAddr, &m_clientAddrLen);
-                    epoll_mod(conn_fd, EPOLLIN | EPOLLET, EPOLL_CTL_ADD);
+                if (sock_fd == m_listenFd) {
+                    int conn_fd = accept(m_listenFd, (struct sockaddr *) &m_clientAddr, &m_clientAddrLen);
+                    EpollMod(conn_fd, EPOLLIN | EPOLLET, EPOLL_CTL_ADD);
                 }
                     // 已连接用户并读取数据
                 else if (events[i].events & EPOLLIN) {
@@ -89,17 +89,18 @@ namespace conn_pool {
 
                     std::string test_str1 = buff;
 
-                    m_router[i].init(sock_fd, test_str1);
-                    m_router_pool->append_work(m_router + i);
-
-                    Logger::Out(DEBUG, test_str1);
+                    m_router[i].SetDstData(sock_fd, test_str1);
+                    m_routerPool->append_work(m_router + i);
+#if SO_DEBUG
+                    LOGD(test_str1);
+#endif
                 }
                     // 已连接用户存在有数据待发送
                 else if (events[i].events & EPOLLOUT) {
                     std::string message = m_router->m_message;
                     std::cout << message << std::endl;
                     send(sock_fd, message.c_str(), message.size(), 0);
-                    epoll_mod(sock_fd, EPOLLIN | EPOLLET);
+                    EpollMod(sock_fd, EPOLLIN | EPOLLET);
 //                    close(sock_fd);
                 }
             }

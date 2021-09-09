@@ -14,7 +14,7 @@
 template<typename T>
 class thread_pool {
 public:
-    thread_pool(SQL::conn_pool *pool, int thread_num = 20, int request_num = 20);
+    thread_pool(Inn::SQLConnPool *pool, int thread_num = 20, int request_num = 20);
 
     bool append_work(T *req);
 
@@ -41,13 +41,13 @@ private:
 
     bool m_run_statue{true};
 
-    SQL::conn_pool *m_mysql_pool;
+    Inn::SQLConnPool *m_mysql_pool;
 
 
 };
 
 template<typename T>
-thread_pool<T>::thread_pool(SQL::conn_pool *pool, int thread_num, int request_num) :
+thread_pool<T>::thread_pool(Inn::SQLConnPool *pool, int thread_num, int request_num) :
         m_mysql_pool(pool), m_THREAD_NUM(thread_num), m_MAX_REQUEST_NUM(request_num) {
 
     m_threads = new pthread_t[m_THREAD_NUM];
@@ -98,9 +98,9 @@ void thread_pool<T>::run() {
 
         m_locker.unlock();
 
-        MYSQL *conn = m_mysql_pool->get_avail_conn();
-        req->do_req(conn);
-        m_mysql_pool->release_conn(conn);
+        MYSQL *conn = m_mysql_pool->GetAvailConn();
+        req->DoReq(conn);
+        m_mysql_pool->ReleaseConn(conn);
     }
 }
 

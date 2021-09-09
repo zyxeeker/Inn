@@ -5,11 +5,11 @@
 #include "sql.h"
 #include "server/logger/logger.h"
 
-namespace SQL {
+namespace Inn {
 //    int conn_pool::m_MAX_CONN_NUMBER = 0;
 //    int conn_pool::m_CUR_CONN_NUMBER = 0;
 
-    bool conn_pool::create_conn() {
+    bool SQLConnPool::CreateConn() {
         MYSQL *conn = mysql_init(nullptr);
         std::string database = "testdb";
         conn = mysql_real_connect(conn,
@@ -23,21 +23,21 @@ namespace SQL {
     }
 
 
-    bool conn_pool::init() {
+    bool SQLConnPool::Init() {
         MYSQL *conn;
         for (int i = 0; i < m_MAX_CONN_NUMBER; ++i) {
-            if (!create_conn()) {
-                Logger::Out(ERROR, "MYSQL`S CONNECTION CREATED FAIL!");
+            if (!CreateConn()) {
+                LOGE("MYSQL`S CONNECTION CREATED FAIL!");
                 break;
             }
         }
-        Logger::Out(INFO, "MYSQL`S CONNECTION CREATED!");
+        LOG("MYSQL`S CONNECTION CREATED!");
         return true;
 
     }
 
 
-    MYSQL *conn_pool::get_avail_conn() {
+    MYSQL * SQLConnPool::GetAvailConn() {
         if (m_CUR_CONN_NUMBER <= m_MAX_CONN_NUMBER) {
             MYSQL *conn = nullptr;
             conn = m_SQL_pool.front();
@@ -45,24 +45,24 @@ namespace SQL {
             ++m_CUR_CONN_NUMBER;
             return conn;
         }
-        Logger::Out(FATAL, "MYSQL`S CONNECTION NUMBER ALREADY TO MAX!");
+        LOGF("MYSQL`S CONNECTION NUMBER ALREADY TO MAX!");
         return nullptr;
     }
 
-    bool conn_pool::release_conn(MYSQL *conn) {
+    bool SQLConnPool::ReleaseConn(MYSQL *conn) {
         if (m_CUR_CONN_NUMBER < 0)
             return false;
-        Logger::Out(INFO, "RELEASE A CONNECTION!");
+        LOG("RELEASE A CONNECTION!");
 
         mysql_close(conn);
         --m_CUR_CONN_NUMBER;
 
         // 释放后添加新的连接
-        if (create_conn()) {
-            Logger::Out(INFO, "ADD A NEW CONNECTION!");
+        if (CreateConn()) {
+            LOG("ADD A NEW CONNECTION!");
             return true;
         } else {
-            Logger::Out(ERROR, "A NEW CONNECTION FAILED TO ADD!");
+            LOGE("A NEW CONNECTION FAILED TO ADD!");
             return false;
         }
     }

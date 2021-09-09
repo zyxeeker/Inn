@@ -10,40 +10,40 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include "server/logger/logger.h"
 #include <iostream>
 #include <string>
 #include <sys/epoll.h>
+#include "server/logger/logger.h"
 #include "server/thread/thread.h"
 #include "server/service/auth/auth.h"
 #include "server/controller/router.h"
 
 class Router;
 
-namespace conn_pool {
-    class conns {
+namespace Inn {
+    class ConnPool {
     public:
-        conns(thread_pool<Router> *router_pool, int port, int MAX_EVENTS, int BUFF_SIZE) :
-                m_router_pool(router_pool), m_port(port), m_MAX_EVENTS(MAX_EVENTS) {
-            Logger::Out(INFO, "Server is working at " + std::to_string(port));
+        ConnPool(thread_pool<Router> *router_pool, int port, int MAX_EVENTS, int BUFF_SIZE) :
+                m_routerPool(router_pool), m_port(port), m_MAX_EVENTS(MAX_EVENTS) {
+            LOG("Server is working at " + std::to_string(port));
         }
 
-        bool init();
+        bool Init();
 
-        bool init_epoll();
+        bool InitEpoll();
 
-        void conn_listen();
+        void StartListen();
 
-        static void epoll_mod(int sock_fd, int statue, int way = EPOLL_CTL_MOD);
+        static void EpollMod(int sock_fd, int statue, int way = EPOLL_CTL_MOD);
 
-        static void sock_send(std::string message, int sock_fd);
+        static void SocketSend(std::string message, int sock_fd);
 
     public:
-        static int m_epoll_fd;
+        static int m_epollFd;
 
     private:
         int m_port;
-        int m_listen_fd;
+        int m_listenFd;
 
         int m_MAX_EVENTS;
 
@@ -52,11 +52,11 @@ namespace conn_pool {
 
         socklen_t m_clientAddrLen = sizeof(m_clientAddr);
         // 监听状态
-        bool m_listen_status{true};
+        bool m_listenSt{true};
 
         Router *m_router;
 
-        thread_pool<Router> *m_router_pool;
+        thread_pool<Router> *m_routerPool;
 
     };
 }

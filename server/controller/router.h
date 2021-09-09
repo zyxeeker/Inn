@@ -11,18 +11,20 @@
 #include "server/service/user/user.h"
 #include "server/service/chat/chatting_room.h"
 
-class Router {
-public:
-    void init(int sock_fd, std::string text);
+namespace Inn{
+    class Router {
+    public:
+        void SetDstData(int socketFd, std::string text);
 
-    void do_req(MYSQL *conn);
+        void DoReq(MYSQL *conn);
 
-    std::string m_message;
-private:
-    std::string m_text;
+        std::string m_message;
+    private:
+        std::string m_text;
 
-    int m_sock_fd;
+        int m_socketFd;
 
+    };
 };
 
 #endif //INN_ROUTER_H

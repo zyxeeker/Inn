@@ -27,13 +27,7 @@ std::string Logger::toString(LOG_LEVEL level) {
 
 Logger::Logger(LOG_LEVEL level, std::string content) {
     char date_t[50];
-
     time_t now = time(nullptr);
-
     strftime(date_t, 50, "%x %X", localtime(&now));
     std::cout << date_t << " [" << toString(level) << "]" << ":" << content << std::endl;
-}
-
-void Logger::Out(LOG_LEVEL level, std::string content) {
-    auto *log = new Logger(level, content);
 }
