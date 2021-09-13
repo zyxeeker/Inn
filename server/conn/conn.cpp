@@ -97,7 +97,7 @@ namespace Inn {
                 }
                     // 已连接用户存在有数据待发送
                 else if (events[i].events & EPOLLOUT) {
-                    std::string message = m_router->m_message;
+                    std::string message = m_router->GetMsg();
                     std::cout << message << std::endl;
                     send(sock_fd, message.c_str(), message.size(), 0);
                     EpollMod(sock_fd, EPOLLIN | EPOLLET);

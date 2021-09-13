@@ -34,4 +34,11 @@ enum REQ_OP{
     INN_USER_CHAT
 };
 
+enum REQ_RESULT{
+    INN_USER_LOGIN_SUC = 0,
+    INN_USER_LOGIN_WRONG = 1,
+    INN_USER_REG_SUC = 2,
+    INN_USER_REG_WRONG = 3
+};
+
 #endif //INN_DEFINE_H
