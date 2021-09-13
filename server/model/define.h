@@ -28,4 +28,10 @@ enum AUTH_REG_RESULT{
     REG_SUC
 };
 
+enum REQ_OP{
+    INN_USER_LOGIN,
+    INN_USER_REG,
+    INN_USER_CHAT
+};
+
 #endif //INN_DEFINE_H

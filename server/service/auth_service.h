@@ -2,8 +2,8 @@
 // Created by ZYXeeker on 2021/4/9.
 //
 
-#ifndef INN_AUTH_H
-#define INN_AUTH_H
+#ifndef INN_AUTH_SERVICE_H
+#define INN_AUTH_SERVICE_H
 
 #include <mysql/mysql.h>
 #include <iostream>
@@ -44,4 +44,4 @@ public:
 
 };
 
-#endif //INN_AUTH_H
+#endif //INN_AUTH_SERVICE_H

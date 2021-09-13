@@ -4,7 +4,7 @@
 
 #include <string>
 #include <map>
-#include "auth.h"
+#include "auth_service.h"
 #include "server/conn/conn.h"
 
 enum LOGIN_STATUE {

@@ -15,8 +15,8 @@
 #include <sys/epoll.h>
 #include "server/logger/logger.h"
 #include "server/thread/thread.h"
-#include "server/service/auth/auth.h"
-#include "server/controller/router.h"
+#include "server/service/auth_service.h"
+#include "server/service/router_service.h"
 
 class Router;
 

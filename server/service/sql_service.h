@@ -2,8 +2,8 @@
 // Created by ZYXeeker on 2021/4/9.
 //
 
-#ifndef INN_SQL_H
-#define INN_SQL_H
+#ifndef INN_SQL_SERVICE_H
+#define INN_SQL_SERVICE_H
 
 #include <string>
 #include "mysql/mysql.h"
@@ -50,4 +50,4 @@ namespace Inn {
     };
 
 }
-#endif //INN_SQL_H
+#endif //INN_SQL_SERVICE_H

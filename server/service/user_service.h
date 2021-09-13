@@ -1,8 +1,8 @@
 //
 // Created by ibuprofenlz on 2021/4/6.
 //
-#ifndef INN_USER_H
-#define INN_USER_H
+#ifndef INN_USER_SERVICE_H
+#define INN_USER_SERVICE_H
 
 #include <unordered_map>
 
@@ -34,5 +34,5 @@ private:
 
 };
 
-#endif //INN_USER_H
+#endif //INN_USER_SERVICE_H
 

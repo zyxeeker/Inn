@@ -6,9 +6,10 @@
 #define INN_THREAD_H
 
 #include <pthread.h>
-#include "locker.h"
 #include <list>
-#include "server/controller/sql.h"
+#include "locker.h"
+#include "server/service/sql_service.h"
+#include "server/model/define.h"
 
 
 template<typename T>
@@ -40,6 +41,8 @@ private:
     sem m_sem;
 
     bool m_run_statue{true};
+
+    int m_st;
 
     Inn::SQLConnPool *m_mysql_pool;
 
@@ -98,8 +101,15 @@ void thread_pool<T>::run() {
 
         m_locker.unlock();
 
+        switch (m_st) {
+            case INN_USER_LOGIN:
+                break;
+            case INN_USER_REG:
+                break;
+        }
+
         MYSQL *conn = m_mysql_pool->GetAvailConn();
-        req->DoReq(conn);
+        req->StartService(conn);
         m_mysql_pool->ReleaseConn(conn);
     }
 }
