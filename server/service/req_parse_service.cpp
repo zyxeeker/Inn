@@ -7,10 +7,14 @@
 namespace Inn{
     int ReqParseService::Core(std::string &str) {
         if (!str.find("LOGIN", 0))
-            return INN_USER_LOGIN;
+            return USER_LOGIN;
         if (!str.find("REG", 0))
-            return INN_USER_REG;
+            return USER_REG;
         if (!str.find("CHAT", 0))
-            return INN_USER_CHAT;
+            return USER_CHAT;
+        if (!str.find("ALIVE", 0))
+            return USER_ALIVE;
+        if (!str.find("LOGOUT", 0))
+            return USER_LOGOUT;
     }
 }

@@ -102,9 +102,9 @@ void thread_pool<T>::run() {
         m_locker.unlock();
 
         switch (m_st) {
-            case INN_USER_LOGIN:
+            case USER_LOGIN:
                 break;
-            case INN_USER_REG:
+            case USER_REG:
                 break;
         }
 

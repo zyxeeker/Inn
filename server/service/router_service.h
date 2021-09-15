@@ -21,6 +21,8 @@ namespace Inn{
         void DoLoginReq();
         void DoRegReq();
         void DoChatReq();
+        void DoHeartBeatReq();
+        void DoLogoutReq();
         std::string GetMsg() const;
 
     private:
