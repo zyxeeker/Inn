@@ -27,10 +27,6 @@ char *Meta::trans(LOG_LEVEL level) {
 
 Meta::Logger *Meta::Logger::m_l = nullptr;
 
-void Meta::Logger::out(LOG_LEVEL level, const char *msg) {
-    char date_t[50];
-    time_t now = time(nullptr);
-    strftime(date_t, 50, "%x %X", localtime(&now));
-    std::cout << date_t << " [" << trans(level) << "]" << ":" << *msg << std::endl;
-
+void Meta::Logger::out(LOG_LEVEL level, const char *func, const char *msg) {
+    std::cout << __DATE__ << " " << __TIME__ << " [" << trans(level) << "](" << func << "):" << msg << std::endl;
 }
