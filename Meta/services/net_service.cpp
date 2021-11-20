@@ -11,6 +11,7 @@
 Meta::NetService *Meta::NetService::m_s = nullptr;
 ssl_ctx_st *Meta::NetService::m_ctx = nullptr;
 ssl_st *Meta::NetService::m_ssl = nullptr;
+int Meta::NetService::m_fd = 0;
 
 void Meta::NetService::SocketInit() {
     struct sockaddr_in p_address;

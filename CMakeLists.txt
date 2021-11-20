@@ -24,3 +24,5 @@ add_executable(${PROJECT_NAME} server/test.cpp
         Meta/thread/locker.h Meta/thread/thread.h)
 
 target_link_libraries(${PROJECT_NAME} libmysqlclient.so)
+target_link_libraries(${PROJECT_NAME} -lssl)
+target_link_libraries(${PROJECT_NAME} -lcrypto)
