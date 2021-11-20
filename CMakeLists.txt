@@ -19,6 +19,8 @@ include_directories(.)
 #        server/test.cpp server/model/define.h server/service/req_parse_service.cpp server/service/req_parse_service.h)
 
 add_executable(${PROJECT_NAME} server/test.cpp
-        Meta/tools/logger.cpp Meta/tools/logger.h Meta/model/define.h)
+        Meta/tools/logger.cpp Meta/tools/logger.h Meta/model/define.h
+        Meta/services/net_service.cpp Meta/services/net_service.h
+        Meta/thread/locker.h Meta/thread/thread.h)
 
 target_link_libraries(${PROJECT_NAME} libmysqlclient.so)
