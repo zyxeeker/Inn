@@ -14,4 +14,12 @@ enum LOG_LEVEL {
     FATAL
 };
 
+enum NET_INIT_ST {
+    INIT_SUCCESS,
+    CREATE_FAILED,
+    BIND_FAILED,
+    LISTEN_FAILED,
+    EPOLL_FAILED
+};
+
 #endif //INN_DEFINE_H
