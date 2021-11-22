@@ -12,7 +12,14 @@
 #define LOG_F(f, x) Meta::Logger::Instance()->out(FATAL,f,x)
 #define LOG_U(f, x) Meta::Logger::Instance()->out(UNKNOWN,f,x)
 
-#include "Meta/model/define.h"
+enum LOG_LEVEL {
+    UNKNOWN,
+    DEBUG,
+    INFO,
+    WARN,
+    ERROR,
+    FATAL
+};
 
 namespace Meta {
     static char *trans(LOG_LEVEL level);
@@ -20,7 +27,7 @@ namespace Meta {
     class Logger {
     public:
         static Logger *Instance() {
-            if (m_l == nullptr)
+            if (!m_l)
                 m_l = new Logger;
             return m_l;
         }

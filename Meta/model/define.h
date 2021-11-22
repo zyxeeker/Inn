@@ -5,14 +5,6 @@
 #ifndef INN_DEFINE_H
 #define INN_DEFINE_H
 
-enum LOG_LEVEL {
-    UNKNOWN,
-    DEBUG,
-    INFO,
-    WARN,
-    ERROR,
-    FATAL
-};
 
 enum NET_INIT_ST {
     INIT_SUCCESS,
