@@ -2,12 +2,9 @@
 // Created by zyxeeker on 11/19/21.
 //
 
-#include <fcntl.h>
 #include "net_service.h"
-
-#if 1
-#define PORT 9006
-#endif
+#include <fcntl.h>
+#include "Meta/util/conf.h"
 
 Meta::NetService *Meta::NetService::service_ = nullptr;
 ssl_ctx_st *Meta::NetService::m_ctx = nullptr;
@@ -25,7 +22,7 @@ int Meta::NetService::BindSocket() const {
     // IPv4
     p_address.sin_family = AF_INET;
     // Port
-    p_address.sin_port = htons(PORT);
+    p_address.sin_port = htons(GET_META_CONF->port);
     p_address.sin_addr.s_addr = INADDR_ANY;
     if (bind(m_fd, (struct sockaddr *) &p_address, sizeof(p_address)) == -1)
         return -1;
@@ -34,8 +31,7 @@ int Meta::NetService::BindSocket() const {
 
 int Meta::NetService::SetListen() const {
     // max num of connections
-    int num_conn = 5;
-    if (listen(m_fd, num_conn) == -1)
+    if (listen(m_fd, GET_META_CONF->listen_num) == -1)
         return -1;
     return 0;
 }
@@ -56,7 +52,7 @@ int Meta::NetService::InitEpoll() {
 }
 
 void Meta::NetService::Run() {
-    auto *events = new epoll_event[50];
+    auto *events = new epoll_event[GET_META_CONF->event_num];
     int p_cur_events_num, p_fd, conn_fd, len;
     char buff[4096];
     while (m_runSt) {
