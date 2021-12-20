@@ -2,71 +2,81 @@
 // Created by zyxeeker on 11/19/21.
 //
 
+#include <fcntl.h>
 #include "net_service.h"
 
 #if 1
 #define PORT 9006
 #endif
 
-Meta::NetService *Meta::NetService::m_s = nullptr;
+Meta::NetService *Meta::NetService::service_ = nullptr;
 ssl_ctx_st *Meta::NetService::m_ctx = nullptr;
 ssl_st *Meta::NetService::m_ssl = nullptr;
-int Meta::NetService::m_epollFd = 0;
-int Meta::NetService::m_listenFd = 0;
 
-NET_INIT_ST Meta::NetService::SocketInit() {
+int Meta::NetService::CreateSocket() {
+    // socket
+    if ((m_fd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        return -1;
+    return 0;
+}
+
+int Meta::NetService::BindSocket() const {
     struct sockaddr_in p_address{};
-    int on = 1;
-    /// socket
-    if ((m_listenFd = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-        return CREATE_FAILED;
-    /// socket参数
-    // 允许端口复用
-    setsockopt(m_listenFd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
-    /// bind
+    // IPv4
     p_address.sin_family = AF_INET;
+    // Port
     p_address.sin_port = htons(PORT);
     p_address.sin_addr.s_addr = INADDR_ANY;
-    if (bind(m_listenFd, (struct sockaddr *) &p_address, sizeof(p_address)) == -1)
-        return BIND_FAILED;
-    /// listen
-    if (listen(m_listenFd, 5) == -1)
-        return LISTEN_FAILED;
-    // epoll 初始化构建
-    try {
-        m_epollFd = epoll_create1(0);
-        m_event.events = EPOLLIN | EPOLLET;
-        m_event.data.fd = m_listenFd;
-        // 将事件加入 epoll 事件列表
-        epoll_ctl(m_epollFd, EPOLL_CTL_ADD, m_listenFd, &m_event);
-    } catch (const char *msg) {
-        LOG_F(__FUNCTION__, msg);
-        return EPOLL_FAILED;
-    }
-    return INIT_SUCCESS;
+    if (bind(m_fd, (struct sockaddr *) &p_address, sizeof(p_address)) == -1)
+        return -1;
+    return 0;
+}
+
+int Meta::NetService::SetListen() const {
+    // max num of connections
+    int num_conn = 5;
+    if (listen(m_fd, num_conn) == -1)
+        return -1;
+    return 0;
+}
+
+int Meta::NetService::SetSocketNonBlocking() const {
+    return fcntl(m_fd, F_SETFL, O_NONBLOCK);
+}
+
+int Meta::NetService::InitEpoll() {
+    // create fd of epoll
+    if ((m_epoll_fd = epoll_create1(0)) == -1)
+        return m_epoll_fd;
+    m_event.events = EPOLLIN | EPOLLET;
+    m_event.data.fd = m_fd;
+    // add fd to let epoll watch
+    epoll_ctl(m_epoll_fd, EPOLL_CTL_ADD, m_fd, &m_event);
+    return 0;
 }
 
 void Meta::NetService::Run() {
     auto *events = new epoll_event[50];
+    int p_cur_events_num, p_fd, conn_fd, len;
+    char buff[4096];
     while (m_runSt) {
-        int CUR_EVENTS_NUMS = epoll_wait(m_epollFd, events, 50, -1);
-        for (int i = 0; i < CUR_EVENTS_NUMS; ++i) {
-            // 新连接加入epoll
-            int sock_fd = events[i].data.fd;
-            if (sock_fd == m_listenFd) {
-                int conn_fd = accept(m_listenFd, (struct sockaddr *) &m_clientAddr, &m_clientAddrLen);
-                EpollMod(conn_fd, EPOLLIN | EPOLLET, EPOLL_CTL_ADD);
+        p_cur_events_num = epoll_wait(m_epoll_fd, events, 50, -1);
+        for (int i = 0; i < p_cur_events_num; ++i) {
+            // add new connection
+            p_fd = events[i].data.fd;
+            if (p_fd == m_fd) {
+                conn_fd = accept(m_fd, (struct sockaddr *) &m_client_address, &m_client_address_length);
+                ModEpoll(conn_fd, EPOLLIN | EPOLLET, EPOLL_CTL_ADD);
             }
-                // 已连接用户并读取数据
+                // already connected to progress data
             else if (events[i].events & EPOLLIN) {
-                char buff[4096];
-                int len = recv(sock_fd, buff, BUFSIZ, 0);
+                len = recv(p_fd, buff, BUFSIZ, 0);
                 if (len <= 0)
                     continue;
                 buff[len] = '\0';
                 LOG_D(__FUNCTION__, buff);
             }
-                // 已连接用户存在有数据待发送
+                // send data when have data need to send
             else if (events[i].events & EPOLLOUT) {
 //                send(sock_fd, message.c_str(), message.size(), 0);
 //                EpollMod(sock_fd, EPOLLIN | EPOLLET);
@@ -92,7 +102,7 @@ void Meta::NetService::SslCreteCtx() {
 
 void Meta::NetService::SslCreateConnection() {
     m_ssl = SSL_new(m_ctx);
-    SSL_set_fd(m_ssl, m_listenFd);
+//    SSL_set_fd(m_ssl, m_fd);
     SSL_set_accept_state(m_ssl);
 }
 
@@ -113,9 +123,9 @@ void Meta::NetService::close() {
 
 }
 
-void Meta::NetService::EpollMod(int socketFd, int statue, int way) {
-    struct epoll_event event;
-    event.data.fd = socketFd;
-    event.events = statue;
-    epoll_ctl(m_epollFd, way, socketFd, &event);
+void Meta::NetService::ModEpoll(int fd, int events, int op) {
+    struct epoll_event event{};
+    event.data.fd = fd;
+    event.events = events;
+    epoll_ctl(m_epoll_fd, op, fd, &event);
 }

@@ -21,11 +21,16 @@ namespace Meta {
     class NetService {
     public:
         static NetService *Instance() {
-            if (!m_s)
-                m_s = new NetService;
-            return m_s;
+            if (!service_)
+                service_ = new NetService;
+            return service_;
         }
-        NET_INIT_ST SocketInit();
+        int CreateSocket();
+        int BindSocket() const;
+        int SetListen() const;
+        int SetSocketNonBlocking() const;
+        int InitEpoll();
+
         void Run();
         static void SslInit();
         static void SslCreteCtx();
@@ -34,18 +39,18 @@ namespace Meta {
         static void SslShutDown();
         static void close();
     private:
-        void EpollMod(int socketFd, int statue, int way);
+        void ModEpoll(int fd, int events, int op);
     private:
         bool m_runSt = true;
-        static NetService *m_s;
+        static NetService *service_;
         static ssl_ctx_st *m_ctx;
         static ssl_st *m_ssl;
-        static int m_epollFd;
-        static int m_listenFd;
+        int m_epoll_fd;
+        int m_fd = -1;
 
-        struct sockaddr_in m_clientAddr;
+        struct sockaddr_in m_client_address;
         struct epoll_event m_event;
-        socklen_t m_clientAddrLen = sizeof(m_clientAddr);
+        socklen_t m_client_address_length = sizeof(sockaddr_in);
     };
 }
 
