@@ -1,0 +1,4 @@
+server:
+  port: 9666
+  event_num: 50
+  listen_num: 5
