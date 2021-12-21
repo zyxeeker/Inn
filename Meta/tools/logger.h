@@ -5,12 +5,12 @@
 #ifndef INN_LOGGER_H
 #define INN_LOGGER_H
 
-#define LOG(f, x) Meta::Logger::Instance()->out(INFO,f,x)
-#define LOG_D(f, x) Meta::Logger::Instance()->out(DEBUG,f,x)
-#define LOG_W(f, x) Meta::Logger::Instance()->out(WARN,f,x)
-#define LOG_E(f, x) Meta::Logger::Instance()->out(ERROR,f,x)
-#define LOG_F(f, x) Meta::Logger::Instance()->out(FATAL,f,x)
-#define LOG_U(f, x) Meta::Logger::Instance()->out(UNKNOWN,f,x)
+#define LOG(x) do{ Meta::Logger::Instance()->out(INFO,__FUNCTION__,x);}while(0)
+#define LOG_D(x) do{ Meta::Logger::Instance()->out(DEBUG,__FUNCTION__,x);}while(0)
+#define LOG_W(x) do{ Meta::Logger::Instance()->out(WARN,__FUNCTION__,x);}while(0)
+#define LOG_E(x) do{ Meta::Logger::Instance()->out(ERROR,__FUNCTION__,x);}while(0)
+#define LOG_F(x) do{ Meta::Logger::Instance()->out(FATAL,__FUNCTION__,x);}while(0)
+#define LOG_U(x) do{ Meta::Logger::Instance()->out(UNKNOWN,__FUNCTION__,x);}while(0)
 
 enum LOG_LEVEL {
     UNKNOWN,

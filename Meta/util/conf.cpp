@@ -3,30 +3,42 @@
 //
 
 #include "conf.h"
-#include "yaml-cpp/yaml.h"
+#include <unistd.h>
+#include <cstdio>
 #include "Meta/tools/logger.h"
 
 Meta::ServerConfig *Meta::ServerConfig::server_setting_ = nullptr;
 
 int Meta::ServerConfig::ReadConfigFile() {
-    YAML::Node config;
     m_server_config = new server_config{};
+    if (access("../config.yaml", F_OK) == -1) {
+        LOG_E("Cannot find config.yaml!");
+        return -1;
+    }
     try {
-        config = YAML::LoadFile("../config.yaml");
+        m_config = YAML::LoadFile("../config.yaml");
     } catch (...) {
-        LOG_E(__FUNCTION__, "Cannot find config.yaml!");
+        LOG_E("Open config.yaml failed!");
         return -1;
     }
-    if (config.IsNull()) {
-        LOG_E(__FUNCTION__, "config.yaml is empty!");
+    if (m_config.IsNull()) {
+        LOG_E("config.yaml is empty!");
         return -1;
-    } else {
-        m_server_config->port = config["server"]["port"].as<int>();
-        m_server_config->event_num = config["server"]["event_num"].as<int>();
-        m_server_config->listen_num = config["server"]["listen_num"].as<int>();
+    } else if (m_config["server"]) {
+        ReadValue("port", m_server_config->port);
+        ReadValue("event_num", m_server_config->event_num);
+        ReadValue("listen_num", m_server_config->listen_num);
+        return 0;
     }
+    return -1;
 }
 
 server_config *Meta::ServerConfig::Settings() {
     return m_server_config;
+}
+
+template<class T>
+void Meta::ServerConfig::ReadValue(const char *key, T &t) const {
+    if (m_config["server"][key])
+        t = m_config["server"][key].template as<T>();
 }

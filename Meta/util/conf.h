@@ -6,6 +6,7 @@
 #define INN_META_UTIL_CONF_H_
 
 #include "Meta/model/define.h"
+#include "yaml-cpp/yaml.h"
 
 #ifndef GET_META_CONF
 #define GET_META_CONF Meta::ServerConfig::Instance()->Instance()->Settings()
@@ -22,8 +23,12 @@ namespace Meta {
         server_config *Settings();
         int ReadConfigFile();
     private:
+        template<class T>
+        void ReadValue(const char *key, T &t) const;
+    private:
         static ServerConfig *server_setting_;
         server_config *m_server_config = nullptr;
+        YAML::Node m_config;
     };
 }
 

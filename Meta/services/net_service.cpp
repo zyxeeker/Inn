@@ -70,7 +70,7 @@ void Meta::NetService::Run() {
                 if (len <= 0)
                     continue;
                 buff[len] = '\0';
-                LOG_D(__FUNCTION__, buff);
+                LOG_D(buff);
             }
                 // send data when have data need to send
             else if (events[i].events & EPOLLOUT) {
